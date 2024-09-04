@@ -11,7 +11,6 @@ import {connection} from "./database/connection";
 /** 
  * Import dotenv/config to read env variable
  */
-import "dotenv/config";
 
 /** 
  *  Start Server with port 4000
