@@ -1,0 +1,18 @@
+/node_modules
+/.pnp
+.pnp.js
+package-lock.json
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+.env
+.vscode
+.yarn
+# misc
+.DS_Store
+*.pem
+
+
+
+
+
