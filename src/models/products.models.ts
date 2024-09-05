@@ -1,6 +1,7 @@
 import mongoose , {Schema} from "mongoose";
 type ProductType = {
     title: String;
+    category: String;
     desc: String;
     name: String;
     qty: Number;
@@ -8,6 +9,7 @@ type ProductType = {
 }
 const ProductSchema: Schema = new Schema<ProductType>({
     title: {type: String,required: true},
+    category: {type: String},
     desc: {type: String},
     name: {type: String,required: true},
     qty: {type: Number,required: true},

@@ -1,7 +1,7 @@
-import express , {Express, NextFunction, Request,Response} from "express";
-import { ProductModel } from "./models/products.models";
+import express , {Express, NextFunction} from "express";
 import { productController } from "./controllers/products.controller";
 import userRequestLog from "./middleware/userRequestLog";
+import paginationProduct from "./middleware/paginationProduct";
 const app: Express = express();
 
 app.use(userRequestLog);
@@ -9,17 +9,10 @@ app.use(express.json());
 
 /** Product API */
 
+
+
 app.get("/products" , productController.getAllProducts);
 app.post("/products",productController.createProduct);
-app.put("/products/:id",async (req:Request,res:Response) =>{
-    const id = req.params?.id;
-    const {title,desc,name,qty,price} = req.body; 
-    const result = await ProductModel.findByIdAndUpdate(id,{
-        title,desc,name,qty,price
-    },{new:true});
-    res.status(200).send({
-        message: `update success`,
-        data: result
-    })
-})
+app.put("/products/:id",productController.updateProduct);
+app.delete("/products/:id", productController.deleteProduct);
 export default app;
