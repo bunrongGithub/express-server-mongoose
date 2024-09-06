@@ -5,11 +5,11 @@ const getAllProducts = async (req: Request, res: Response, next:NextFunction) =>
     let page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 5;
     const category = req.query.category as string;
-    const sort = req.query.sort as string;
+   
+    const sort =  req.query.sort as string;
+    const sorted: Record<string , any> = {['price']: sort , ['stock']: sort}
+
     const stock = req.query?.stock as string;
-    const sortBy = sort || 'price'; // Default to sorting by price
-    const sortOrder = sortBy.startsWith('-') ? 'desc' : 'asc';
-    const sortField = sortBy.startsWith('-') ? sortBy.substring(1) : sortBy;
 
     page = page > 0 ? page : 1;
     limit = limit > 0 ? limit : 5;
@@ -33,7 +33,7 @@ const getAllProducts = async (req: Request, res: Response, next:NextFunction) =>
 
         // Fetch the paginated data
         const products = await ProductModel.find(condition)
-            .sort({[sortField]: sortOrder})
+            .sort(sorted)
             .skip((page -1) * limit)
             .limit(limit)
             .select(['name','title', 'qty', 'desc', 'price', 'category','stock'])
@@ -55,7 +55,7 @@ const getAllProducts = async (req: Request, res: Response, next:NextFunction) =>
         next(error)
     }
 };
-const createProduct = async (req: Request,res:Response) => {
+const createProduct = async (req: Request,res:Response,next:NextFunction) => {
     const {name,title,desc,qty,price,category,stock} = req.body;
     try {
         const product = new ProductModel({
@@ -67,7 +67,7 @@ const createProduct = async (req: Request,res:Response) => {
             data: product
         })
     } catch (error: any){
-        res.status(500).send(`Error creating item: ${error.message}`);
+        next(error)
     }
 }
 const updateProduct = async (req:Request,res:Response) => {
@@ -85,7 +85,7 @@ const updateProduct = async (req:Request,res:Response) => {
         console.log(error);
     } 
 }
-const deleteProduct = async (req: Request, res: Response) => {
+const deleteProduct = async (req: Request, res: Response, next:NextFunction) => {
     try {
         const id = req.params?.id;
         const product = await ProductModel.findByIdAndDelete(id);
@@ -100,9 +100,7 @@ const deleteProduct = async (req: Request, res: Response) => {
             data: product
         })
     } catch (error) {
-        res.status(500).send({
-            message: `Internal Server Error!`
-        })
+       next(error)
     }
 
 }

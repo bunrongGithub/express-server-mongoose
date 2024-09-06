@@ -7,12 +7,12 @@ import app from "./app"
  *  Connection to mongoose
  */
 import {connection} from "./database/connection";
-import errorHandler from "./errorHandler";
 
 
 /**
  * GLOBAL ERROR HANDLER MIDDLEWARE
- */
+*/
+import errorHandler from "./middleware/errorHandler";
 app.use(errorHandler);
 /** 
  *  Start Server with port 4000
