@@ -7,14 +7,17 @@ import app from "./app"
  *  Connection to mongoose
  */
 import {connection} from "./database/connection";
+import errorHandler from "./errorHandler";
 
-/** 
- * Import dotenv/config to read env variable
+
+/**
+ * GLOBAL ERROR HANDLER MIDDLEWARE
  */
-
+app.use(errorHandler);
 /** 
  *  Start Server with port 4000
  */
+
 const startServer = async () => {
   try {
     await connection().then(() => {

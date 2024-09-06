@@ -1,21 +1,30 @@
-import { Request,Response } from "express"
+import { NextFunction, Request,Response } from "express"
 import { ProductModel } from "../models/products.models";
-const getAllProducts = async (req: Request, res: Response) => {
+const getAllProducts = async (req: Request, res: Response, next:NextFunction) => {
     // Extract query parameters
-    let start = parseInt(req.query.start as string) || 0;
+    let page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 5;
-    
     const category = req.query.category as string;
+    const sort = req.query.sort as string;
+    const stock = req.query?.stock as string;
+    const sortBy = sort || 'price'; // Default to sorting by price
+    const sortOrder = sortBy.startsWith('-') ? 'desc' : 'asc';
+    const sortField = sortBy.startsWith('-') ? sortBy.substring(1) : sortBy;
 
-    const startIndex = (start - 1) * limit;
-    const endIndex = start * limit;
-    // Ensure start and limit are valid numbers
-    if (isNaN(start) || start < 0) start = 0;
-    if (isNaN(limit) || limit <= 0) limit = 5;
+    page = page > 0 ? page : 1;
+    limit = limit > 0 ? limit : 5;
+    
+    /** Stock query */
 
-  
     const condition: any = {}
-    if(category){
+    if (stock) {
+        // Convert comma-separated stock values to an array of numbers
+        const stockValues = stock.split(',').map(value => parseInt(value.trim(), 10));
+        if (stockValues.length > 0) {
+            condition.stock = { $gte: stockValues[0],$lte: stockValues[1] };
+        }
+    }
+    if (category) {
         condition.category = category;
     }
     try {
@@ -24,35 +33,33 @@ const getAllProducts = async (req: Request, res: Response) => {
 
         // Fetch the paginated data
         const products = await ProductModel.find(condition)
-            .sort({category:1})
-            .skip(startIndex)
-            .limit(endIndex)
-            .select(['name','title', 'qty', 'desc', 'price', 'category'])
+            .sort({[sortField]: sortOrder})
+            .skip((page -1) * limit)
+            .limit(limit)
+            .select(['name','title', 'qty', 'desc', 'price', 'category','stock'])
             .exec();
-
         res.status(200).send({
             message: 'Request success!',
             data: {
                 totalCount,
                 products,
-                start,
+                page,
                 limit,
                 totalPage: Math.ceil(totalCount / limit),
-                currentPage: start,
-                hasNextPage: start * limit < totalCount,
-                hasPreviousPage: start > 1
+                currentPage: page,
+                hasNextPage: page * limit < totalCount,
+                hasPreviousPage: page > 1
             }
         });
     } catch (error: any) {
-        console.error(error?.message);
-        res.status(500).send({ message: 'Internal server error' });
+        next(error)
     }
 };
 const createProduct = async (req: Request,res:Response) => {
-    const {name,title,desc,qty,price,category} = req.body;
+    const {name,title,desc,qty,price,category,stock} = req.body;
     try {
         const product = new ProductModel({
-            title,desc,name,qty,price,category
+            title,desc,name,qty,price,category,stock
         })
         await product.save();
         res.status(201).send({
