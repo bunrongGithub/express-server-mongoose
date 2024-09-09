@@ -19,6 +19,9 @@ const getAllProducts = async (req: Request, res: Response, next:NextFunction) =>
     const sortedQuery: Record<string , any> = {};
     const sorts = req.query?.sorts ? JSON.parse(req.query?.sorts as string) : {};
     
+    // converts desc and asc to mongosh query!
+    // input: {stock:"desc", price: 'asc'}
+    // output: {stock: -1 , price: 1}
     for(let key in sorts){
         if(sorts[key] === 'desc'){
             sortedQuery[key] = -1;
