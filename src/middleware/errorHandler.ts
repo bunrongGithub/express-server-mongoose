@@ -4,7 +4,7 @@ interface ErrorHandler extends Error {
     statusCode?: number; 
 }
 const errorHandler = 
-(err:ErrorHandler , req: Request, res:Response , next:NextFunction) => 
+(err:ErrorHandler , _req: Request, res:Response , _next:NextFunction) => 
 {
     const statusCode = err.statusCode || 500;
     const message = err.message || `Internal Server Error!`

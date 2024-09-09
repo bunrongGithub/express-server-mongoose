@@ -1,4 +1,4 @@
-import express , {Express, NextFunction} from "express";
+import express , {Express} from "express";
 import { productController } from "./controllers/products.controller";
 import userRequestLog from "./middleware/userRequestLog";
 import validation , {productSchema} from "./middleware/productValidation";

@@ -2,13 +2,32 @@ import { NextFunction, Request,Response } from "express"
 import { ProductModel } from "../models/products.models";
 const getAllProducts = async (req: Request, res: Response, next:NextFunction) => {
     // Extract query parameters
-    let page = parseInt(req.query.page as string) || 1;
-    let limit = parseInt(req.query.limit as string) || 5;
-    const category = req.query.category as string;
-   
-    const sort =  req.query.sort as string;
-    const sorted: Record<string , any> = {['price']: sort , ['stock']: sort}
+    let page = parseInt(req.query?.page as string) || 1;
+    let limit = parseInt(req.query?.limit as string) || 5;
+    const category = req.query?.category as string;
 
+    /** 
+     * http://localhost:4000/products
+     * http://localhost:4000/products?category="phone"
+     * http://localhost:4000/products?sorts={"stock":"asc","price":"desc"}
+     * http://localhost:4000/products?page=1&limit=10&sorts={"stock":"asc","price":"desc"}
+     */
+
+    
+    
+    /** sort By object */
+    const sortedQuery: Record<string , any> = {};
+    const sorts = req.query?.sorts ? JSON.parse(req.query?.sorts as string) : {};
+    
+    for(let key in sorts){
+        if(sorts[key] === 'desc'){
+            sortedQuery[key] = -1;
+        }else{
+            sortedQuery[key] = 1;
+        }
+    }
+    //console.log(sorts)
+    /** sort by object */
     const stock = req.query?.stock as string;
 
     page = page > 0 ? page : 1;
@@ -33,7 +52,7 @@ const getAllProducts = async (req: Request, res: Response, next:NextFunction) =>
 
         // Fetch the paginated data
         const products = await ProductModel.find(condition)
-            .sort(sorted)
+            .sort(sortedQuery)
             .skip((page -1) * limit)
             .limit(limit)
             .select(['name','title', 'qty', 'desc', 'price', 'category','stock'])
