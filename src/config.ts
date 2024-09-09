@@ -1,5 +1,7 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({path: "src/configs/.env"});
+
 export default {
-    mongoURL: process.env.MONGO_URL,
-    apiKey: process.env.API_KEY
+    mongoURL: process.env.MONGO_URL as string,
+    port: process.env.PORT,
 }

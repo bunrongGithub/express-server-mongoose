@@ -8,6 +8,8 @@ import app from "./app"
  */
 import {connection} from "./database/connection";
 
+/** load config from .env */
+import config from "./config";
 
 /**
  * GLOBAL ERROR HANDLER MIDDLEWARE
@@ -21,11 +23,12 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connection().then(() => {
-      app.listen(process.env.PORT , () => {
-        console.log(`server running at http://localhost:${process.env.PORT}`)
+      app.listen(config.port , () => {
+        console.log(`server running at http://localhost:${config.port}`)
       })
     })
   } catch (error) {
+    /** if the server crash it will close the connection */
     process.exit(1);
   }
 }

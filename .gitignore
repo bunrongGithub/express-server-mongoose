@@ -12,6 +12,7 @@ next-env.d.ts
 .DS_Store
 *.pem
 
+src/configs/.env
 
 request.rest
 
